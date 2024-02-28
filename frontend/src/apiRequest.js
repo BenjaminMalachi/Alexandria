@@ -1,21 +1,28 @@
 async function apiRequest(url, options = {}) {
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...options.headers,
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-    });
-  
-    if (response.status === 401) {
-      // Token has expired or is invalid
-      localStorage.removeItem('token'); // Clear the stored token
-      window.location.href = '/login'; // Redirect to login page
-      return Promise.reject('Session expired. Please log in again.');
-    }
-  
-    return response;
+  // Retrieve the token from local storage
+  const token = localStorage.getItem('token');
+
+  // Ensure headers object exists
+  options.headers = options.headers || {};
+
+  if (token) {
+    // Include the Authorization header with the token
+    options.headers['Authorization'] = `Bearer ${token}`;
   }
-  
-  export default apiRequest;
-  
+
+  const response = await fetch(url, options);
+
+  // Check for unauthorized access (token expired or invalid)
+  if (response.status === 401) {
+    // Clear the stored token
+    localStorage.removeItem('token');
+    // Redirect to the login page or handle session expiration
+    window.location.href = '/login';
+    // Optionally, you can return or throw an error here
+    return Promise.reject('Session expired. Please log in again.');
+  }
+
+  return response;
+}
+
+export default apiRequest;

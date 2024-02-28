@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 function Registration() {
     const [email, setEmail] = useState('');
@@ -11,7 +12,7 @@ function Registration() {
         e.preventDefault();
     
         try {
-            const response = await fetch('http://localhost:3000/api/auth/register', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -61,6 +62,9 @@ function Registration() {
                     className="p-2 border border-gray-300 rounded"
                 />
                 <button type="submit" className="bg-sunset text-white p-2 rounded">Register</button>
+                <div className="text-center">
+                    <Link to="/" className="text-deepBrown hover:text-sunset">Already have an account? Log in</Link>
+                </div>
             </form>
         </div>
     );

@@ -2,17 +2,19 @@ const express = require('express');
 const Course = require('../models/course');
 const router = express.Router();
 const createError = require('http-errors');
+const User = require('../models/User');
 const { verifyToken, verifyRole, updateLastAction } = require('../middleware/verifyToken');
 
 
 // Create a new course (Admins and Teachers)
 router.post('/', verifyToken, verifyRole(['admin', 'teacher']), updateLastAction, async (req, res) => {
-    const { title, description, teacher } = req.body;
+    const { title, description, teacher, students } = req.body;
     try {
         const newCourse = new Course({
             title,
             description,
-            teacher
+            teacher,
+            students
         });
         await newCourse.save();
         res.status(201).json(newCourse);

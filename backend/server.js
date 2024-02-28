@@ -29,7 +29,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/homework', homeworkRoutes);
-app.use('/api/submissions', submissionRoutes);
+app.use('/api/submission', submissionRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Simple route for GET request

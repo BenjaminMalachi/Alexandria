@@ -20,10 +20,16 @@ router.post('/', verifyToken, verifyRole(['teacher', 'admin']), updateLastAction
     }
 });
 
-// Get all homework
+// Get all homework, with optional filtering by course ID
 router.get('/', verifyToken, updateLastAction, async (req, res) => {
+    let query = {}; // Initialize an empty query object
+    if (req.query.courseId) {
+        // If courseId query parameter exists, add it to the query object
+        query.course = req.query.courseId; // Ensure this matches the ObjectId type in your database
+    }
+
     try {
-        const homeworks = await Homework.find().populate('course');
+        const homeworks = await Homework.find(query).populate('course'); // Use the query object in the find method
         res.json(homeworks);
     } catch (err) {
         res.status(500).json({ message: err.message });

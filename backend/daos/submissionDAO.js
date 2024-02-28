@@ -5,8 +5,16 @@ class SubmissionDAO {
         this.model = model;
     }
 
-    async create(submissionData) {
+    async create(submissionData, fileData = null) {
         try {
+            // If fileData is provided, incorporate it into the submissionData
+            if (fileData) {
+                submissionData.fileInfo = {
+                    s3Bucket: fileData.s3Bucket,
+                    s3Key: fileData.s3Key,
+                };
+            }
+
             const submission = new this.model(submissionData);
             await submission.save();
             return submission;
