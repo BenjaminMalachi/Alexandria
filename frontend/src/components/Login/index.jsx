@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import './login.css'; // If you have additional styles
+import dunes from '../../assets/dunes.jpg';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -48,29 +49,46 @@ function Login() {
       }, [location]);
 
     return (
-        <div className="min-h-screen flex justify-center items-center bg-marble">
-            <form onSubmit={handleSubmit} className="p-10 bg-white rounded flex flex-col space-y-4">
-                <h2 className="text-center text-2xl font-bold text-deepBrown">Login</h2>
-                <input
+        <div className="min-h-screen flex">
+            {/* Left side with the image */}
+            <div
+                className="w-3/4"
+                style={{
+                backgroundImage: `url(${dunes})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                }}
+            >
+                {/* You can leave this div empty or add content that overlays the image */}
+            </div>
+
+            {/* Right Side - Form Container */}
+            <div className="w-1/4 flex justify-center items-center bg-marble">
+                <form onSubmit={handleSubmit} className="p-10 bg-white rounded-lg shadow-lg">
+                <h2 className="text-3xl font-bold text-deep-brown mb-8">Login</h2>
+                {message && <p className="text-sunset-red mb-4">{message}</p>}
+                <div className="flex flex-col space-y-4">
+                    <input
                     type="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="p-2 border border-gray-300 rounded"
-                />
-                <input
+                    className="input input-bordered w-full max-w-xs"
+                    />
+                    <input
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="p-2 border border-gray-300 rounded"
-                />
-                <button type="submit" className="bg-sunset text-white p-2 rounded">Log In</button>
-                <div className="text-center">
-                    <Link to="/register" className="text-spinach hover:underline">Need an account?</Link>
+                    className="input input-bordered w-full max-w-xs"
+                    />
+                    <button type="submit" className="btn btn-primary bg-sunset-red text-white">Log In</button>
                 </div>
-            </form>
-            {message && <p>{message}</p>}
+                <div className="text-center mt-4">
+                    <Link to="/register" className="link link-hover text-deep-green">Need an account?</Link>
+                </div>
+                </form>
+            </div>
         </div>
     );
 }
