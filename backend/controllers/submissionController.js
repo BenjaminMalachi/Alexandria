@@ -1,6 +1,7 @@
 const SubmissionDAO = require('../daos/submissionDAO');
-const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { fromEnv } = require('@aws-sdk/credential-provider-env');
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const express = require('express');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
@@ -21,7 +22,8 @@ const upload = multer({
             cb(null, { fieldName: file.fieldname });
         },
         key: function (req, file, cb) {
-            cb(null, Date.now().toString())
+            const newFileName = `${Date.now()}_${file.originalname}`;
+            cb(null, newFileName)
         }
     })
 });
@@ -166,15 +168,20 @@ class SubmissionController {
     }
 
     static async getFile(req, res) {
-        const { s3Key } = req.params; // Assuming you pass the S3 key as a parameter
-    
-        const url = s3.getSignedUrl('getObject', {
+        const { s3Key } = req.params;
+      
+        try {
+          const command = new GetObjectCommand({
             Bucket: process.env.AWS_BUCKET_NAME,
             Key: s3Key,
-            Expires: 60 * 5, // Link expires in 5 minutes, adjust as needed
-        });
-    
-        res.json({ url });
+          });
+          const url = await getSignedUrl(s3, command, { expiresIn: 3600 }); // Adjust expiresIn as needed
+      
+          res.json({ url });
+        } catch (error) {
+          console.error('Error generating file download link:', error);
+          res.status(500).json({ error: error.message });
+        }
     }
 
     static async findSubmissionsByStudent(req, res) {

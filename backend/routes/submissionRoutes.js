@@ -13,8 +13,10 @@ router.patch('/:id', upload.single('file'), verifyToken, verifyRole(['teacher', 
 
 router.delete('/:id', verifyToken, verifyRole(['student']), updateLastAction, SubmissionController.deleteSubmission);
 
-router.get('/teacher/submissions', verifyToken, verifyRole(['teacher']), SubmissionController.findSubmissionsForTeacher);
+router.get('/teacher/submissions', verifyToken, verifyRole(['teacher']),updateLastAction, SubmissionController.findSubmissionsForTeacher);
 
 router.get('/student/submissions', verifyToken, updateLastAction, SubmissionController.findSubmissionsForLoggedInStudent);
+
+router.get('/file/:s3Key', verifyToken, updateLastAction, SubmissionController.getFile);
 
 module.exports = router;

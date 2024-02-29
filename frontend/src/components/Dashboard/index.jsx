@@ -93,10 +93,12 @@ const Dashboard = () => {
         setShowSubmitForm(true); // Assuming you manage the form visibility with this state
     };
 
+    //HandleGradeClick
     const handleGradeClick = (submissionId) => {
         setGradingInfo({ ...gradingInfo, [submissionId]: true });
     };
     
+    //HandleGradeChange
     const handleGradeChange = (e, submissionId) => {
         const newGrade = e.target.value; // Correctly extract the text value from the input field
         setGrades({
@@ -105,6 +107,7 @@ const Dashboard = () => {
         });
     };
 
+    //submitGrade
     const submitGrade = async (submissionId) => {
         const grade = grades[submissionId];
         if (!grade) {
@@ -162,6 +165,32 @@ const Dashboard = () => {
             } catch (error) {
                 console.error('Error submitting grade:', error);
             }
+    };
+
+    //Download file
+    const handleDownloadFile = async (s3Key) => {
+        try {
+            const token = localStorage.getItem('token');
+        
+            // Check if the token exists
+            if (!token) {
+                console.error("No token found");
+                return; // Optionally, handle this case more gracefully
+            }
+
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/submission/file/${s3Key}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`, // Include auth token if required
+              },
+            });
+            if (!response.ok) throw new Error('Network response was not ok.');
+            const data = await response.json();
+        
+            // Use the signed URL directly without trying to parse it as JSON
+            window.open(data.url, '_blank'); // This will start the download or open the file in a new tab, depending on the file type and browser settings
+          } catch (error) {
+            console.error('Error downloading file:', error);
+          }
     };
 
     const fetchDashboardData = async (role) => {
@@ -396,12 +425,17 @@ const Dashboard = () => {
                                                             <span>{submission.answer}</span>
                                                             </td>
                                                             <td className="py-3 px-6 text-center">
-                                                            {submission.fileUpload && (
-                                                                <>
-                                                                <i className="file icon"></i> {/* Icon for file */}
-                                                                <span className="ml-2">{submission.fileUpload.s3Key}</span> {/* Filename or some identifier */}
-                                                                </>
-                                                            )}
+                                                                {submission.fileUpload && (
+                                                                    <>
+                                                                        <i className="file icon"></i> {/* Icon for file */}
+                                                                        <button
+                                                                            onClick={() => handleDownloadFile(submission.fileUpload.s3Key)}
+                                                                            className="ml-2 underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                                                                        >
+                                                                            Download File
+                                                                        </button>
+                                                                    </>
+                                                                )}
                                                             </td>
                                                             <td className="py-3 px-6 text-center">
                                                             <div className="flex item-center justify-center">
