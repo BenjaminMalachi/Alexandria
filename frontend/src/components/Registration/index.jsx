@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import Header from '../Header';
+import dunes from '../../assets/dunes.jpg';
 
 function Registration() {
     const [email, setEmail] = useState('');
@@ -37,36 +39,56 @@ function Registration() {
     };
 
     return (
-        <div className="min-h-screen flex justify-center items-center bg-marble">
-            <form onSubmit={handleSubmit} className="p-10 bg-white rounded flex flex-col space-y-4">
-                <h2 className="text-center text-2xl font-bold text-deepBrown">Register</h2>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="p-2 border border-gray-300 rounded"
-                />
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="p-2 border border-gray-300 rounded"
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="p-2 border border-gray-300 rounded"
-                />
-                <button type="submit" className="bg-sunset text-white p-2 rounded">Register</button>
-                <div className="text-center">
-                    <Link to="/" className="text-deepBrown hover:text-sunset">Already have an account? Log in</Link>
-                </div>
-            </form>
+        <>
+        <Header />
+        <div className="min-h-screen flex">
+            {/* Left side with the image */}
+            <div
+                className="w-3/4"
+                style={{
+                backgroundImage: `url(${dunes})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                }}
+            >
+                {/* You can leave this div empty or add content that overlays the image */}
+            </div>
+
+            {/* Right Side - Form Container */}
+            <div className="w-1/4 flex justify-center items-center bg-marble">
+                <form onSubmit={handleSubmit} className="p-10 bg-white rounded-lg shadow-lg">
+                    <h2 className="text-3xl font-bold text-deep-brown mb-8">Register</h2>
+                    <div className="flex flex-col space-y-4">
+                    <input
+                        type="text"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="input input-bordered w-full max-w-xs"
+                    />
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="input input-bordered w-full max-w-xs"
+                    />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="input input-bordered w-full max-w-xs"
+                    />
+                    <button type="submit" className="btn btn-primary bg-sunset-red text-white">Register</button>
+                    <div className="text-center">
+                        <Link to="/" className="link link-hover text-deep-green">Already have an account? Log in</Link>
+                    </div>
+                    </div>
+                </form>
+            </div>
         </div>
+        </>
     );
 }
 

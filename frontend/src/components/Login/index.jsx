@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import './login.css'; // If you have additional styles
 import dunes from '../../assets/dunes.jpg';
+import Header from '../Header/';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -49,6 +50,8 @@ function Login() {
       }, [location]);
 
     return (
+        <>
+        <Header />
         <div className="min-h-screen flex">
             {/* Left side with the image */}
             <div
@@ -90,6 +93,7 @@ function Login() {
                 </form>
             </div>
         </div>
+        </>
     );
 }
 

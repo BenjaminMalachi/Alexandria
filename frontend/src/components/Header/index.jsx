@@ -4,12 +4,14 @@ import React, { useEffect } from 'react';
 
 function Header() {
   return (
-      <header className="bg-marble text-deepBrown flex justify-between items-center p-4">
-          <h1 className="text-xl font-bold">Alexandria</h1>
-          <nav>
-              {/* Navigation Links */}
-          </nav>
-      </header>
+    <header className="bg-marble text-deepBrown flex justify-between items-center p-4 shadow-lg">
+        <h1 className="text-3xl font-bold tracking-tight">
+        Alexandria
+        </h1>
+        <div className="flex items-center">
+        {/* You can add additional buttons or icons here, if needed */}
+        </div>
+    </header>
   );
 }
 

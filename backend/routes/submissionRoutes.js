@@ -9,7 +9,7 @@ router.get('/', verifyToken, verifyRole(['teacher', 'admin']), updateLastAction,
 
 router.get('/student/:studentId', verifyToken, updateLastAction, SubmissionController.findSubmissionsByStudent);
 
-router.patch('/:id', upload.single('file'), verifyToken, verifyRole(['student']), updateLastAction, SubmissionController.updateSubmission);
+router.patch('/:id', upload.single('file'), verifyToken, verifyRole(['teacher', 'student']), updateLastAction, SubmissionController.updateSubmission);
 
 router.delete('/:id', verifyToken, verifyRole(['student']), updateLastAction, SubmissionController.deleteSubmission);
 

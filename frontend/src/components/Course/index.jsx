@@ -56,7 +56,7 @@ function Course() {
         const homeworkResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/homework?courseId=${id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+          } 
         });
         const homeworkData = await homeworkResponse.json();
         setHomework(homeworkData);
