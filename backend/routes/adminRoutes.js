@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { verifyToken, verifyRole } = require('../middleware/verifyToken');
 const User = require('../models/User');
-const Course = require('../models/course');
+const Course = require('../models/Course');
 
 // Assuming verifyToken and verifyRole are middleware that check the user's token and role
 router.get('/statistics', verifyToken, verifyRole(['admin']), async (req, res) => {

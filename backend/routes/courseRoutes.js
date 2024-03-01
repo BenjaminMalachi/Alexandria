@@ -1,5 +1,5 @@
 const express = require('express');
-const Course = require('../models/course');
+const Course = require('../models/Course');
 const router = express.Router();
 const createError = require('http-errors');
 const User = require('../models/User');

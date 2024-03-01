@@ -1,4 +1,4 @@
-const Course = require('../models/course');
+const Course = require('../models/Course');
 
 class CourseDAO {
     constructor(model) {
