@@ -7,7 +7,7 @@ router.post('/', upload.single('file'), verifyToken, verifyRole(['student']), up
 
 router.get('/', verifyToken, verifyRole(['teacher', 'admin']), updateLastAction, SubmissionController.findAllSubmissions);
 
-router.get('/student/:studentId', verifyToken, updateLastAction, SubmissionController.findSubmissionsByStudent);
+router.get('/student/:id', verifyToken, updateLastAction, SubmissionController.findSubmissionsByStudent);
 
 router.patch('/:id', upload.single('file'), verifyToken, verifyRole(['teacher', 'student']), updateLastAction, SubmissionController.updateSubmission);
 

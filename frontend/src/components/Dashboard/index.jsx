@@ -341,9 +341,9 @@ const Dashboard = () => {
                 console.log('userData fetched:',userData.courses);
             } catch (error) {
                 console.error('Error fetching student dashboard data:', error);
-            }
+            };
 
-        }        
+        };        
         
     };
 

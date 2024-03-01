@@ -1,140 +1,208 @@
 import React, { useState, useEffect } from 'react';
 import NavBar from '../NavBar';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import SubmissionForm from '../SubmissionForm';
+import dunes from '../../assets/dunes.jpg';
+
+const decodeJWT = (token) => {
+  try {
+      const base64Url = token.split('.')[1]; // JWT payload is the second part of the token
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const payload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(payload);
+  } catch (error) {
+      console.error("Error decoding JWT", error);
+      return null;
+  }
+};
 
 function Course() {
   const { id } = useParams();
   const [userId, setUserId] = useState('');
-  const [course, setCourse] = useState(null);
+  const [course, setCourse] = useState({});
   const [homework, setHomework] = useState([]);
   const [role, setRole] = useState('');
-  const [showSubmitForm, setShowSubmitForm] = useState(false); // To control form visibility
-  const [selectedHomeworkId, setSelectedHomeworkId] = useState(null); // To know which homework is being submitted/edited
-  const [submissions, setSubmissions] = useState({}); // To store student submissions keyed by homework ID
-  const [formMode, setFormMode] = useState('submit'); 
+  const [showSubmitForm, setShowSubmitForm] = useState(false);
+  const [selectedHomeworkId, setSelectedHomeworkId] = useState(null);
+  const [submissions, setSubmissions] = useState({});
+  const [formMode, setFormMode] = useState('submit');
+  const [editingSubmission, setEditingSubmission] = useState(null);
+  const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
 
   useEffect(() => {
-    const fetchUserRoleAndSubmissions = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const payload = JSON.parse(window.atob(base64));
-        
-        if(payload) {
-          if(payload.role) {
-            setRole(payload.role); // Set user role
-          }
-          if(payload.id) { // Assuming 'id' is the field in your JWT payload
-            setUserId(payload.id); // Set user ID
-          }
-        } else {
-          console.error('Payload is empty');
-        }
-      } else {
-        console.error('No token found in localStorage');
+    const token = localStorage.getItem('token');
+    if (token) {
+      const payload = decodeJWT(token);
+      setUserId(payload.id);
+      fetchCourseDetails(token);
+      fetchHomeworkDetails(token);
+      if (payload.role === 'student') {
+        setRole(payload.role);
+        fetchSubmissions(token, payload.id);
       }
-    };
-  
-    fetchUserRoleAndSubmissions().catch(error => console.error('Failed to load user role or submissions:', error));
-  }, [id]); // Runs when component mounts or 'id' changes
+    }
+  }, [id]);
 
-  useEffect(() => {
-    // Fetch course details from your API
-    const fetchCourseAndHomework = async () => {
-        // Fetch course details
-        const courseResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/courses/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        const courseData = await courseResponse.json();
-        setCourse(courseData);
-  
-        // Fetch homework assignments for the course
-        const homeworkResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/homework?courseId=${id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          } 
-        });
-        const homeworkData = await homeworkResponse.json();
-        setHomework(homeworkData);
-      };
-  
-      fetchCourseAndHomework().catch(error => {
-        console.error('Failed to load course or homework:', error.message);
-        // Handle errors (e.g., show error message, redirect to login)
+  const fetchCourseDetails = async (token) => {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/courses/${id}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    });
+    const data = await response.json();
+    setCourse(data);
+  };
+
+  const fetchHomeworkDetails = async (token) => {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/homework?courseId=${id}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    });
+    const data = await response.json();
+    setHomework(data);
+  };
+
+  const fetchSubmissions = async (token, userId) => {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/submission/student/${userId}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    });
+    const data = await response.json();
+    if (Array.isArray(data)) {
+      const submissionsMap = data.reduce((acc, submission) => {
+        acc[submission.homework] = submission;
+        return acc;
+      }, {});
+      setSubmissions(submissionsMap);
+    } else {
+      console.error('Submissions fetch did not return an array:', data);
+    }
+  };
+
+  const handleEditClick = (hwId) => {
+    setSelectedHomeworkId(hwId);
+    setFormMode('edit');
+    setShowSubmitForm(true);
+    const submissionToEdit = submissions[hwId];
+    if (submissionToEdit) {
+      setEditingSubmission(submissionToEdit);
+    }
+  };
+
+  const handleSubmitClick = (hwId) => {
+    setSelectedHomeworkId(hwId);
+    setFormMode('submit');
+    setShowSubmitForm(true);
+  };
+
+  const handleDeleteSubmission = async (submissionId) => {
+    if (!window.confirm('Are you sure you want to delete this submission?')) return;
+
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/submission/${submissionId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
       });
-    }, [id]);
-  
-    if (!course) return <div>Loading...</div>;
 
-    const handleEditClick = (hwId) => {
-      setSelectedHomeworkId(hwId);
-      setFormMode('edit');
-      setShowSubmitForm(true); // Open the form
-    };
-  
-    const handleSubmitClick = (hwId) => {
-      console.log('Setting selectedHomeworkId to:', hwId);
-      setSelectedHomeworkId(hwId);
-      setFormMode('submit');
-      setShowSubmitForm(true); // Open the form
-    };
+      const updatedSubmissions = { ...submissions };
+      delete updatedSubmissions[submissionId];
+      setSubmissions(updatedSubmissions);
+      setShowSuccessOverlay(true);
+      setTimeout(() => setShowSuccessOverlay(false), 3000);
+    } catch (error) {
+      console.error('Error deleting submission:', error);
+    }
+  };
 
-    return (
-      <>
-        <NavBar />
-        <div>
-          {role === 'student' && (
-            <>
-              <h2>{course.title}</h2>
-              <p>{course.description}</p>
-              {/* Display other course details as needed */}
-              <h3>Homework Assignments</h3>
-              {Array.isArray(homework) && (
-                <ul>
-                  {homework.map((hw) => (
-                    <li key={hw._id}>
-                      <strong>{hw.title}</strong>: {hw.description} (Due: {new Date(hw.dueDate).toLocaleDateString()})
-                      {/* Check if student has submitted this homework */}
-                      {submissions[hw._id] ? (
-                        <>
-                          <button onClick={() => handleEditClick(hw._id)}>Edit Submission</button>
-                          <button onClick={() => handleDeleteSubmission(hw._id)}>Delete Submission</button>
-                          {/* Display submission details here */}
-                        </>
-                      ) : (
-                        <button onClick={() => handleSubmitClick(hw._id)}>Submit</button>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+  return (
+    <>
+      <NavBar />
+      <div className="flex flex-col h-screen" style={{
+        backgroundImage: `url(${dunes})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}>
+        {role === 'student' && (
+          <div className="space-y-6 p-4">
+            <div className="bg-marble p-6 rounded-lg shadow-lg">
+              <h2 className="text-deepBrown text-4xl mb-4">{course.title}</h2>
+              <p className="text-deepBrown text-lg">{course.description}</p>
+            </div>
+  
+            <div className="bg-oasisblue p-6 rounded-lg shadow-lg">
+              <h3 className="text-deepBrown text-3xl mb-4 font-semibold">Homework Assignments</h3>
+              {homework.map((hw) => (
+                <div key={hw._id} className="mb-4">
+                  <strong className="text-deepBrown">{hw.title}</strong>: {hw.description} (Due: {new Date(hw.dueDate).toLocaleDateString()})
+                  {/* Check if there's a submission for the homework */}
+                  {submissions[hw._id] ? (
+                    <>
+                      <table className="mt-4 w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                          <tr>
+                            <th scope="col" className="py-3 px-6">Answer</th>
+                            <th scope="col" className="py-3 px-6">File</th>
+                            <th scope="col" className="py-3 px-6">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                            <td className="py-4 px-6">{submissions[hw._id].answer}</td>
+                            <td className="py-4 px-6">
+                              {submissions[hw._id].fileUpload ? (
+                                <a href={`${import.meta.env.VITE_API_URL}/api/submission/file/${submissions[hw._id].fileUpload.s3Key}`} target="_blank" rel="noopener noreferrer">Download File</a>
+                              ) : 'No File'}
+                            </td>
+                            <td className="py-4 px-6">
+                              <button className="font-medium text-blue-600 dark:text-blue-500 hover:underline" onClick={() => handleEditClick(hw._id)}>Edit</button>
+                              <button className="font-medium text-red-600 dark:text-red-500 hover:underline ml-4" onClick={() => handleDeleteSubmission(submissions[hw._id]._id)}>Delete</button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </>
+                  ) : (
+                    <button className="ml-4 bg-deepGreen text-white p-1 rounded hover:bg-blue-600" onClick={() => handleSubmitClick(hw._id)}>Submit</button>
+                  )}
+                </div>
+              ))}
+              {showSubmitForm && (
+                <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-center items-center">
+                  <div className="bg-white p-5 rounded-lg max-w-md mx-auto">
+                    <SubmissionForm
+                      hwId={selectedHomeworkId}
+                      studentId={userId}
+                      initialSubmission={editingSubmission}
+                      mode={formMode}
+                      onClose={() => {
+                        setShowSubmitForm(false);
+                        setSelectedHomeworkId(null);
+                        setEditingSubmission(null);
+                      }}
+                    />
+                    <button
+                      className="mt-4 bg-red-500 text-white p-2 rounded hover:bg-sunset"
+                      onClick={() => {
+                        setShowSubmitForm(false);
+                        setSelectedHomeworkId(null);
+                        setEditingSubmission(null);
+                      }}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
               )}
-              {/* Conditionally render the submission form as an overlay */}
-              <SubmissionForm
-                hwId={selectedHomeworkId}
-                studentId={userId}
-                mode={showSubmitForm}
-                onClose={() => {
-                  setShowSubmitForm(false);
-                  setSelectedHomeworkId(null); // Reset selectedHomeworkId when the form is closed
-                }}
-              />
-            </>
-          )}
-    
-          {role === 'teacher' && ( //Need to work on this the submission for the teachers homework.map is not going to show submissions bc HW dont have submission data
+            </div>
+          </div>
+        )}
+          {role === 'teacher' && (
             <ul>
               {homework.map((hw) => (
-                <li key={hw._id}>
-                  <strong>{hw.title}</strong>: {hw.description} (Due: {new Date(hw.dueDate).toLocaleDateString()})
-                  {/* Ensure submissions exist and is an array */}
+                <li key={hw._id} className="mb-2.5">
+                  <strong className="text-indigo-800">{hw.title}</strong>: {hw.description} (Due: {new Date(hw.dueDate).toLocaleDateString()})
                   {Array.isArray(hw.submissions) && hw.submissions.map((submission) => (
-                    <div key={submission._id}>
+                    <div key={submission._id} className="mt-1.5 pl-5">
                       <span>{submission.studentName}'s submission</span>
-                      <button onClick={() => openMarkSubmissionForm(submission._id)}>Mark Submission</button>
+                      <button className="ml-2 bg-orange-500 text-white p-1 rounded hover:bg-orange-600" onClick={() => openMarkSubmissionForm(submission._id)}>Mark Submission</button>
                       {/* Optionally display a link or button to download/view the submitted file */}
                     </div>
                   ))}
@@ -142,10 +210,11 @@ function Course() {
               ))}
             </ul>
           )}
-        </div>
-      </>
-    );    
+      </div>
+    </>
+
+  );    
     
-    }
+}
     
-    export default Course;
+export default Course;

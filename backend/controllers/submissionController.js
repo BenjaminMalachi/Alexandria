@@ -186,8 +186,8 @@ class SubmissionController {
 
     static async findSubmissionsByStudent(req, res) {
         try {
-            const { studentId } = req.params;
-            const submissions = await Submission.find({ student: studentId });
+            const { id  } = req.params;
+            const submissions = await Submission.find({ student: id  });
             res.json(submissions);
         } catch (err) {
             res.status(500).json({ message: err.message });
