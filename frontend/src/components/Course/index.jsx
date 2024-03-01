@@ -46,7 +46,7 @@ function Course() {
   }, [id]);
 
   const fetchCourseDetails = async (token) => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/courses/${id}`, {
+    const response = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/courses/${id}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     });
     const data = await response.json();
@@ -54,7 +54,7 @@ function Course() {
   };
 
   const fetchHomeworkDetails = async (token) => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/homework?courseId=${id}`, {
+    const response = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/homework?courseId=${id}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     });
     const data = await response.json();
@@ -62,7 +62,7 @@ function Course() {
   };
 
   const fetchSubmissions = async (token, userId) => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/submission/student/${userId}`, {
+    const response = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/submission/student/${userId}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     });
     const data = await response.json();
@@ -97,7 +97,7 @@ function Course() {
     if (!window.confirm('Are you sure you want to delete this submission?')) return;
 
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/submission/${submissionId}`, {
+      await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/submission/${submissionId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
       });
@@ -135,8 +135,8 @@ function Course() {
                   {/* Check if there's a submission for the homework */}
                   {submissions[hw._id] ? (
                     <>
-                      <table className="mt-4 w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                      <table className="mt-4 w-full text-sm text-left text-gray-500">
+                        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                           <tr>
                             <th scope="col" className="py-3 px-6">Answer</th>
                             <th scope="col" className="py-3 px-6">File</th>
@@ -144,16 +144,16 @@ function Course() {
                           </tr>
                         </thead>
                         <tbody>
-                          <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                          <tr className="bg-white border-b">
                             <td className="py-4 px-6">{submissions[hw._id].answer}</td>
                             <td className="py-4 px-6">
                               {submissions[hw._id].fileUpload ? (
-                                <a href={`${import.meta.env.VITE_API_URL}/api/submission/file/${submissions[hw._id].fileUpload.s3Key}`} target="_blank" rel="noopener noreferrer">Download File</a>
+                                <a href={`${import.meta.env.REACT_APP_API_BASE_URL}/api/submission/file/${submissions[hw._id].fileUpload.s3Key}`} target="_blank" rel="noopener noreferrer">Download File</a>
                               ) : 'No File'}
                             </td>
                             <td className="py-4 px-6">
-                              <button className="font-medium text-blue-600 dark:text-blue-500 hover:underline" onClick={() => handleEditClick(hw._id)}>Edit</button>
-                              <button className="font-medium text-red-600 dark:text-red-500 hover:underline ml-4" onClick={() => handleDeleteSubmission(submissions[hw._id]._id)}>Delete</button>
+                              <button className="font-medium text-blue-600 hover:underline" onClick={() => handleEditClick(hw._id)}>Edit</button>
+                              <button className="font-medium text-red-600 hover:underline ml-4" onClick={() => handleDeleteSubmission(submissions[hw._id]._id)}>Delete</button>
                             </td>
                           </tr>
                         </tbody>

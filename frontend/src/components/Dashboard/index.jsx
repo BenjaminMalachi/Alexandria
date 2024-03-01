@@ -65,7 +65,7 @@ const Dashboard = () => {
     const handleDeleteSubmission = async (submissionId) => {
         if (window.confirm('Are you sure you want to delete this submission?')) {
           try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/submission/${submissionId}`, {
+            const response = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/submission/${submissionId}`, {
               method: 'DELETE',
               headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -115,7 +115,7 @@ const Dashboard = () => {
             return; // Optionally handle this case more gracefully
         }
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/submission/${submissionId}`, {
+            const response = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/submission/${submissionId}`, {
               method: 'PATCH',
               headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -178,7 +178,7 @@ const Dashboard = () => {
                 return; // Optionally, handle this case more gracefully
             }
 
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/submission/file/${s3Key}`, {
+            const response = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/submission/file/${s3Key}`, {
               headers: {
                 'Authorization': `Bearer ${token}`, // Include auth token if required
               },
@@ -197,7 +197,7 @@ const Dashboard = () => {
         console.log('Fetching data for role:', role);
         if (role === 'admin') {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/statistics`, {
+                const response = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/admin/statistics`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                 });
                 if (!response.ok) {
@@ -225,21 +225,21 @@ const Dashboard = () => {
               const teacherId = decodeJWT(token).id; // Decode the token to get the teacher's ID
         
               // Fetch courses first
-              const coursesResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/courses/teacher/courses`, {
+              const coursesResponse = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/courses/teacher/courses`, {
                 headers: { Authorization: `Bearer ${token}` }
               });
               const coursesData = await coursesResponse.json();
               console.log('courses Data fetched:', coursesData);
               
               // Now that you have coursesData, you can use it to fetch homeworks
-              const homeworksResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/homework?courses=${coursesData.map(course => course._id).join(',')}`, {
+              const homeworksResponse = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/homework?courses=${coursesData.map(course => course._id).join(',')}`, {
                 headers: { Authorization: `Bearer ${token}` },
               });
               const homeworksData = await homeworksResponse.json();
               console.log('homeworks Data fetched:', homeworksData);
               
               // Fetch submissions
-              const submissionsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/submission`, {
+              const submissionsResponse = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/submission`, {
                 headers: { Authorization: `Bearer ${token}` }
               });
               const submissionsData = await submissionsResponse.json();
@@ -309,7 +309,7 @@ const Dashboard = () => {
                 const studentId = decodedPayload.id; // Replace 'sub' with the correct property name for student ID
         
                 // FETCH courses
-                const coursesResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/courses/student/courses`, {
+                const coursesResponse = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/courses/student/courses`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                 });
                 let coursesData = await coursesResponse.json();
@@ -319,14 +319,14 @@ const Dashboard = () => {
                 const filteredCourses = coursesData.filter(course => course.students.some(student => student._id === userId));
         
                 //FETCH submissions
-                const submissionsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/submission/student/${studentId}`, {
+                const submissionsResponse = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/submission/student/${studentId}`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                 });
                 const submissionsData = await submissionsResponse.json();
                 console.log('submission Data fetched:', submissionsData);
 
                 //FETCH homeworks
-                const homeworksResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/homework?courses=${coursesData.map(course => course._id).join(',')}`, {
+                const homeworksResponse = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/homework?courses=${coursesData.map(course => course._id).join(',')}`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                 });
                 let homeworksData = await homeworksResponse.json();
