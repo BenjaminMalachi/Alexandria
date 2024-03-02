@@ -574,7 +574,7 @@ const Dashboard = () => {
                                                 <span>{submission.answer}</span>
                                                 </td>
                                                 <td className="py-4 px-6 text-center">
-                                                  {submission._id.grade || "Unmarked"}
+                                                  {submission.grade || "Unmarked"}
                                                 </td>
                                                 <td className="py-3 px-6 text-center">
                                                 {submission.fileUpload && (

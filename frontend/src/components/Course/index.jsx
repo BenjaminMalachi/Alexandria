@@ -289,6 +289,8 @@ function Course() {
           }
       };
 
+      console.log(submissions);
+
   return (
     <>
       <NavBar />
@@ -309,8 +311,8 @@ function Course() {
               {homework.map((hw) => (
                 <div key={hw._id} className="mb-4">
                   <strong className="text-deepBrown">{hw.title}</strong>: {hw.description} (Due: {new Date(hw.dueDate).toLocaleDateString()})
-                  {/* Check if there's a submission for the homework */}
-                  {submissions[hw._id] ? (
+                  {/* Enhanced check for submission existence */}
+                  {submissions[hw._id] && submissions[hw._id].length ? (
                     <>
                       <table className="mt-4 w-full text-sm text-left text-gray-500">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
@@ -322,29 +324,32 @@ function Course() {
                           </tr>
                         </thead>
                         <tbody>
-                          <tr className="bg-white border-b">
-                            <td className="py-4 px-6">{submissions[hw._id].answer}</td>
-                            <td className="py-4 px-6">
-                              {submissions[hw._id]?.fileUpload ? (
+                          {/* Assuming submissions[hw._id] is an array of submissions, map through it */}
+                          {submissions[hw._id].map((submission, index) => (
+                            <tr key={index} className="bg-white border-b">
+                              <td className="py-4 px-6">{submission.answer || 'No answer provided'}</td>
+                              <td className="py-4 px-6">
+                                {submission.fileUpload ? (
                                   <>
-                                  <i className="file icon"></i> {/* Icon for file */}
-                                  <button
-                                      onClick={() => handleDownloadFile(submissions[hw._id].fileUpload.s3Key)}
+                                    <i className="file icon"></i> {/* Icon for file */}
+                                    <button
+                                      onClick={() => handleDownloadFile(submission.fileUpload.s3Key)}
                                       className="ml-2 underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-                                  >
+                                    >
                                       Download File
-                                  </button>
-                              </>
-                              ) : 'No File'}
-                            </td>
-                            <td className="py-4 px-6">
-                              {submissions[hw._id].grade || "Unmarked"}
-                            </td>
-                            <td className="py-4 px-6">
-                              <button className="font-medium text-blue-600 hover:underline" onClick={() => handleEditClick(hw._id)}>Edit</button>
-                              <button className="font-medium text-red-600 hover:underline ml-4" onClick={() => handleDeleteSubmission(submissions[hw._id]._id) }>Delete</button>
-                            </td>
-                          </tr>
+                                    </button>
+                                  </>
+                                ) : 'No File'}
+                              </td>
+                              <td className="py-4 px-6">
+                                {submission.grade || "Unmarked"}
+                              </td>
+                              <td className="py-4 px-6">
+                                <button className="font-medium text-blue-600 hover:underline" onClick={() => handleEditClick(hw._id)}>Edit</button>
+                                <button className="font-medium text-red-600 hover:underline ml-4" onClick={() => handleDeleteSubmission(submission._id)}>Delete</button>
+                              </td>
+                            </tr>
+                          ))}
                         </tbody>
                       </table>
                     </>
