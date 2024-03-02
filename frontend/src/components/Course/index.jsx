@@ -53,7 +53,7 @@ function Course() {
   }, [id, role]); // Added role as a dependency
 
   const fetchCourseDetails = async () => {
-    const response = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/courses/${id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/courses/${id}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     });
     const data = await response.json();
@@ -74,7 +74,7 @@ function Course() {
 
   const fetchUserDetails = async (userId) => {
     // Fetch user details for a given ID
-    const response = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/users/${userId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users/${userId}`, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
     });
     if (!response.ok) {
@@ -85,7 +85,7 @@ function Course() {
   };
 
   const fetchHomeworkDetails = async () => {
-    const response = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/homework?courseId=${id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/homework?courseId=${id}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     });
     const data = await response.json();
@@ -93,7 +93,7 @@ function Course() {
   };
 
   const fetchSubmissions = async (userId) => {
-    const response = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/submission/student/${userId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/submission/student/${userId}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     });
     const data = await response.json();
@@ -114,7 +114,7 @@ function Course() {
   const fetchAllSubmissionsForCourse = async () => {
     try {
       // Fetch all submissions for the course
-      const response = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/submissions/course/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/submissions/course/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       if (!response.ok) throw new Error('Failed to fetch submissions');
@@ -155,7 +155,7 @@ function Course() {
     if (!window.confirm('Are you sure you want to delete this submission?')) return;
   
     try {
-      const response = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/submission/${submissionId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/submission/${submissionId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
       });
@@ -200,7 +200,7 @@ function Course() {
             return; // Optionally, handle this case more gracefully
         }
 
-        const response = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/submission/file/${s3Key}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/submission/file/${s3Key}`, {
           headers: {
             'Authorization': `Bearer ${token}`, // Include auth token if required
           },
@@ -237,7 +237,7 @@ function Course() {
           return; // Optionally handle this case more gracefully
       }
       try {
-          const response = await fetch(`${import.meta.env.REACT_APP_API_BASE_URL}/api/submission/${submissionId}`, {
+          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/submission/${submissionId}`, {
             method: 'PATCH',
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`,
