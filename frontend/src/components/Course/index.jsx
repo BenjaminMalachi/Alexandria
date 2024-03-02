@@ -386,12 +386,13 @@ function Course() {
       )}
 
       {role === 'teacher' && (
-          <>
+          <div className="space-y-6 p-4">
             <div className="bg-marble p-6 rounded-lg shadow-lg">
               <h2 className="text-deepBrown text-4xl mb-4">{course.title}</h2>
               <p className="text-deepBrown text-lg">{course.description}</p>
             </div>
             <div className="bg-marble shadow overflow-hidden sm:rounded-md my-4">
+            <h3 className="text-deepBrown text-3xl mb-4 font-semibold pt-4">Enrolled Students</h3>
               <ul className="divide-y divide-gray-200">
                 {users.map(user => (
                   <li key={user.id} className="px-6 py-4 whitespace-nowrap text-sm font-medium text-deepBrown">
@@ -479,7 +480,7 @@ function Course() {
                   ))}
                 </div>
             </div>
-          </>
+          </div>
         )}
     </div>
   </>
