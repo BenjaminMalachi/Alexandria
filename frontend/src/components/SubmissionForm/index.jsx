@@ -21,7 +21,7 @@ function SubmissionForm({ hwId, mode, onClose, initialSubmission, studentId, onS
     }
 
     // Adjust endpoint URL and method based on the mode
-    const endpoint = mode === 'submit' ? `${import.meta.env.VITE_API_URL}/api/submission` : `${import.meta.env.VITE_API_URL}/api/submission/${initialSubmission._id}`;
+    const endpoint = mode === 'submit' ? `${import.meta.env.REACT_APP_API_BASE_URL}/api/submission` : `${import.meta.env.REACT_APP_API_BASE_URL}/api/submission/${initialSubmission._id}`;
     const method = mode === 'submit' ? 'POST' : 'PATCH'; // Assuming PUT is used for edits
 
     const token = localStorage.getItem('token');
