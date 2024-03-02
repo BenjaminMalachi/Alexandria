@@ -10,8 +10,8 @@ const Submission = require('../models/Submission');
 const app = express()
 
 const s3 = new S3Client({
-    region: process.env.AWS_REGION,
-    credentials: fromEnv(), // This automatically loads credentials from environment variables
+    //region: process.env.AWS_REGION,
+    // credentials: fromEnv(), // This automatically loads credentials from environment variables
 });
 
 const upload = multer({
@@ -29,22 +29,18 @@ const upload = multer({
 });
 
 const deleteFileFromS3 = async (s3Key, s3Bucket) => {
-    const params = {
-      Bucket: s3Bucket,
-      Key: s3Key,
-    };
-  
-    try {
-      // Use DeleteObjectCommand to create a command object for deletion
-      const command = new DeleteObjectCommand(params);
-      // Use send method of the client with the command object
-      await s3.send(command);
-      console.log("File deleted successfully from S3");
-    } catch (error) {
-      console.error("Error deleting file from S3:", error);
-      throw new Error("Failed to delete file from S3.");
-    }
-  };
+    const command = new DeleteObjectCommand({
+        Bucket: s3Bucket,
+        Key: s3Key,
+      });
+    
+      try {
+        const response = await s3.send(command);
+        console.log(response);
+      } catch (err) {
+        console.error(err);
+      }
+};
 
 class SubmissionController {
 
@@ -149,11 +145,8 @@ class SubmissionController {
             const submissionToDelete = await SubmissionDAO.findById(submissionId);
             
             if (submissionToDelete && submissionToDelete.fileUpload && submissionToDelete.fileUpload.s3Key) {
-                // Delete the file from S3
-                await s3.deleteObject({
-                    Bucket: submissionToDelete.fileUpload.s3Bucket,
-                    Key: submissionToDelete.fileUpload.s3Key,
-                }).promise();
+                // Use your existing function to delete the file from S3
+                await deleteFileFromS3(submissionToDelete.fileUpload.s3Key, submissionToDelete.fileUpload.s3Bucket);
             }
     
             // Now delete the submission from MongoDB
@@ -163,6 +156,7 @@ class SubmissionController {
             }
             res.status(204).send(); // No Content
         } catch (error) {
+            console.error('Error in deleteSubmission:', error);
             res.status(500).json({ error: error.message });
         }
     }

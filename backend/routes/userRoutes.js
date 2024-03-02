@@ -20,7 +20,7 @@ router.get('/', verifyToken, verifyRole(['admin']), updateLastAction, async (req
 });
 
 // Get a single user by ID (Admin only)
-router.get('/:id', verifyToken, verifyRole(['admin']), updateLastAction, async (req, res) => {
+router.get('/:id', verifyToken, verifyRole(['admin', 'teacher']), updateLastAction, async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).send('User not found');
