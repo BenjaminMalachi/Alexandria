@@ -9,7 +9,9 @@ export default defineConfig({
       '/api': 'http://localhost:3000'
     }
   },
-  build: {
-    outDir: 'build', // Custom output directory
+  server: {
+    // Listen on all network interfaces and use the PORT environment variable
+    host: true,
+    port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
   },
 })
